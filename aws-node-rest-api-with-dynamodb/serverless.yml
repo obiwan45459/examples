@@ -1,10 +1,13 @@
 service: serverless-rest-api-with-dynamodb
 
-frameworkVersion: ">=1.1.0 <2.0.0"
+frameworkVersion: "2.70.0"
+
+#useDotenv: true
+#variablesResolutionMode: 20210326
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs14.x
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
   iamRoleStatements:
@@ -16,7 +19,34 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+#        - cloudsearch:*
+#      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      Resource: "arn:aws:dynamodb:us-east-1:733698491396:table/Products"
+#     Resource: "arn:aws:cloudsearch:us-east-1:733698491396:domain/product-search"
+#      Resource: '*'
+    - Effect: Allow
+      Action:
+        - cloudsearch:*
+      Resource: "arn:aws:cloudsearch:us-east-1:733698491396:domain/business-search"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:733698491396:table/ZipCodes"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:733698491396:table/States"
+
 
 functions:
   create:
@@ -35,6 +65,32 @@ functions:
           method: get
           cors: true
 
+  listAUTH:
+    handler: todos/list.list
+    events:
+      - http:
+          path: todos/auth
+          method: get
+          cors: true
+
+  echoback:
+    handler: todos/echoback.echoback
+    events:
+      - http:
+          path: todos/echoback
+          method: get
+          cors: true
+
+
+  Stateslist:
+    handler: todos/Stateslist.Stateslist
+    events:
+      - http:
+          path: todos/statesList
+          method: get
+          cors: true
+
+
   get:
     handler: todos/get.get
     events:
@@ -43,11 +99,50 @@ functions:
           method: get
           cors: true
 
+  getauth:
+    handler: todos/getauth.getauth
+    events:
+      - http:
+          path: todos/getauth
+          method: get
+          cors: true
+  search:
+    handler: todos/search.search
+    events:
+      - http:
+          path: todos/search/{id}
+          method: get
+          cors: true
+
+  searchZip:
+    handler: todos/searchZip.searchZip
+    events:
+      - http:
+          path: todos/searchZip/{zipcode}
+          method: get
+          cors: true
+
+  Citieslist:
+    handler: todos/Citieslist.Citieslist
+    events:
+      - http:
+          path: todos/Citieslist/{id}
+          method: get
+          cors: true
+
   update:
     handler: todos/update.update
     events:
       - http:
           path: todos/{id}
+          method: put
+          cors: true
+
+  updateAuth:
+    handler: todos/updateAuth.updateAuth
+    events:
+      - http:
+          path: todos/updateauth
           method: put
           cors: true
 

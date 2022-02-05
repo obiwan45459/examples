@@ -3,10 +3,21 @@
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+var csd = new AWS.CloudSearchDomain({
+  endpoint: 'search-business-search-7swaoxjyhqtx5sfk24yryfxg4a.us-east-1.cloudsearch.amazonaws.com',
+  apiVersion: '2013-01-01'
+});
 
-module.exports.update = (event, context, callback) => {
+module.exports.updateAuth = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const data = JSON.parse(event.body);
+
+  const authProvider = event.requestContext.identity.cognitoAuthenticationProvider;
+  const parts = authProvider.split(':');
+  const userPoolIdParts = parts[parts.length - 3].split('/');
+
+  const userPoolId = userPoolIdParts[userPoolIdParts.length - 1];
+  const userPoolUserId = parts[parts.length - 1];
 
   // validation
   // if (typeof data.text !== 'string' || typeof data.checked !== 'boolean') {
@@ -56,7 +67,7 @@ const params = {
   
   TableName: "Products",
   Key: {
-   ID: event.pathParameters.id
+   ID: userPoolUserId
 // ID: "bb535ca0-1429-11ec-a64d-e300e82ed84c"
   },
   UpdateExpression: "set  username = :n, description = :d, city = :c, occupation = :o, contact = :con, USstate = :s",
@@ -87,6 +98,30 @@ const params = {
 //  // imageURL: data.imageURL
 //   },
 };
+
+var jbatch = [  {"type": "add",
+                    "id": userPoolUserId,
+                    "fields": {"accountactive": "T",
+                              "city": data.city,
+                              "contact": data.contact,
+                              "description": data.description,
+                              "id": userPoolUserId,
+                              "name": data.name,
+                              "occupation": data.occupation,
+                              "username": data.name,
+                              "usstate": data.state}, } ];
+    
+    var paramsCloudSearch = { contentType: 'application/json', documents: JSON.stringify(jbatch) };
+
+    csd.uploadDocuments(paramsCloudSearch, function(err, data) {
+      if (err) {
+          console.log('CloudSearchDomain ERROR');
+      }
+      else {
+          console.log('CloudSearchDomain SUCCESS');
+      }
+  });
+
 
 
   // update the todo in the database

@@ -4,11 +4,20 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-module.exports.get = (event, context, callback) => {
+module.exports.getauth = (event, context, callback) => {
+
+  const authProvider = event.requestContext.identity.cognitoAuthenticationProvider;
+  const parts = authProvider.split(':');
+  const userPoolIdParts = parts[parts.length - 3].split('/');
+
+  const userPoolId = userPoolIdParts[userPoolIdParts.length - 1];
+  const userPoolUserId = parts[parts.length - 1];
+
   const params = {
     TableName: "Products",
     Key: {
-      ID: event.pathParameters.id,
+    //  ID: event.pathParameters.id,
+    ID: userPoolUserId,
     },
   };
 

@@ -5,6 +5,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "serverless": "^2.70.0",
     "uuid": "^2.0.3"
   }
 }

@@ -5,17 +5,17 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const params = {
 //  TableName: process.env.DYNAMODB_TABLE,
-    TableName: "Products",
-    FilterExpression: 'accountActive = :value',
-    ExpressionAttributeValues: { 
-    ':value': 'T',
-  }
-    // Key: {
-    //   id: event.pathParameters.id,
-    // }
+    TableName: "States",
+//    FilterExpression: 'accountActive = :value',
+//    ExpressionAttributeValues: { 
+//    ':value': 'T',
+//  }
+  //   Key: {
+  //     id: event.pathParameters.id,
+  //   }
 };
 
-module.exports.list = (event, context, callback) => {
+module.exports.Stateslist = (event, context, callback) => {
   // fetch all todos from the database
 
   //const params = {
